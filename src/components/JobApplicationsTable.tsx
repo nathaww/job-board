@@ -141,7 +141,7 @@ export function JobApplicationsTable({
             <TableHead className="hidden sm:table-cell">Salary</TableHead>
             <TableHead className="hidden sm:table-cell">Type</TableHead>
             <TableHead
-              className="w-[120px] cursor-pointer hover:bg-muted/50 select-none flex gap-1 text-primary items-center"
+              className="w-[150px] cursor-pointer hover:bg-muted/50 select-none flex gap-1 text-primary items-center"
               onClick={() => handleSort('dateApplied')}
             >
               Date Applied

@@ -99,7 +99,7 @@ function App() {
 
         <Card className="bg-card border-border shadow-sm py-0">
           <CardHeader className='px-0'>
-            <div className="flex flex-row justify-between items-center gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <CardTitle>
                 Applications ({filteredApplications.length})
               </CardTitle>

@@ -91,12 +91,12 @@ export function JobApplicationForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
           <DialogTitle>
             {mode === 'add' ? 'Add New Job Application' : 'Edit Job Application'}
           </DialogTitle>
-        </DialogHeader>
+        </DialogHeader> 
         
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

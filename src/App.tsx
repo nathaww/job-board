@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus } from 'lucide-react';
+import { Loader, Plus } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { JobApplicationForm } from './components/JobApplicationForm';
@@ -63,7 +63,7 @@ function App() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <Loader className='h-12 w-12 animate-spin mx-auto text-primary' />
           <p className="mt-4 text-muted-foreground">Loading applications...</p>
         </div>
       </div>
@@ -83,7 +83,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className=" mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">Job Application Dashboard</h1>
           <p className="text-muted-foreground mt-2">Track and manage your job applications</p>

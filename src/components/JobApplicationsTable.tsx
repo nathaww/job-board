@@ -1,12 +1,11 @@
-import { useState } from 'react';
-import { Edit2, Trash2, ExternalLink, ChevronUp, ChevronDown } from 'lucide-react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger } from './ui/select';
-import { useDeleteJobApplication, useUpdateApplicationStatus } from '../hooks/useJobApplicationQueries';
-import type { JobApplication, ApplicationStatus } from '../types/job';
 import { format } from 'date-fns';
+import { ChevronDown, ChevronUp, Edit2, ExternalLink, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { useDeleteJobApplication } from '../hooks/useJobApplicationQueries';
+import type { ApplicationStatus, JobApplication } from '../types/job';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 
 interface JobApplicationsTableProps {
   applications: JobApplication[];
@@ -16,14 +15,13 @@ interface JobApplicationsTableProps {
 type SortField = 'jobTitle' | 'companyName' | 'dateApplied' | 'salary' | 'status';
 type SortDirection = 'asc' | 'desc';
 
-export function JobApplicationsTable({ 
-  applications, 
+export function JobApplicationsTable({
+  applications,
   onEdit
 }: JobApplicationsTableProps) {
   const [sortField, setSortField] = useState<SortField>('dateApplied');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const deleteMutation = useDeleteJobApplication();
-  const updateStatusMutation = useUpdateApplicationStatus();
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this application?')) {
@@ -32,14 +30,6 @@ export function JobApplicationsTable({
       } catch (error) {
         console.error('Error deleting application:', error);
       }
-    }
-  };
-
-  const handleStatusUpdate = async (id: string, status: ApplicationStatus) => {
-    try {
-      await updateStatusMutation.mutateAsync({ id, status });
-    } catch (error) {
-      console.error('Error updating status:', error);
     }
   };
 
@@ -85,7 +75,7 @@ export function JobApplicationsTable({
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return null;
-    return sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />;
+    return sortDirection === 'asc' ? <ChevronUp className="h-4 w-4 text-primary" /> : <ChevronDown className="h-4 w-4" />;
   };
 
   const formatDate = (dateString: string) => {
@@ -114,17 +104,15 @@ export function JobApplicationsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead 
-              className="cursor-pointer hover:bg-muted/50 select-none"
+            <TableHead
+              className="cursor-pointer hover:bg-muted/50 select-none flex items-center gap-2"
               onClick={() => handleSort('jobTitle')}
             >
-              <div className="flex items-center gap-2">
-                Job Title
-                <SortIcon field="jobTitle" />
-              </div>
+              Job Title
+              <SortIcon field="jobTitle" />
             </TableHead>
             <TableHead className="hidden md:table-cell">Description</TableHead>
-            <TableHead 
+            <TableHead
               className="cursor-pointer hover:bg-muted/50 select-none"
               onClick={() => handleSort('companyName')}
             >
@@ -135,17 +123,15 @@ export function JobApplicationsTable({
             </TableHead>
             <TableHead className="hidden lg:table-cell">Salary</TableHead>
             <TableHead className="hidden sm:table-cell">Type</TableHead>
-            <TableHead 
-              className="cursor-pointer hover:bg-muted/50 select-none"
+            <TableHead
+              className="w-[120px] cursor-pointer hover:bg-muted/50 select-none flex gap-1 items-center"
               onClick={() => handleSort('dateApplied')}
             >
-              <div className="flex items-center gap-2">
-                Date Applied
-                <SortIcon field="dateApplied" />
-              </div>
+              Date Applied
+              <SortIcon field="dateApplied" />
             </TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -175,39 +161,19 @@ export function JobApplicationsTable({
                 <div className="text-sm">{formatDate(application.dateApplied)}</div>
               </TableCell>
               <TableCell>
-                <Select
-                  value={application.status}
-                  onValueChange={(value: string) => handleStatusUpdate(application.id, value as ApplicationStatus)}
-                >
-                  <SelectTrigger className="w-32">
-                    <Badge className={`text-xs ${getStatusColor(application.status)}`}>
-                      {application.status}
-                    </Badge>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Applied">
-                      <Badge className="text-xs bg-secondary text-secondary-foreground">Applied</Badge>
-                    </SelectItem>
-                    <SelectItem value="Interview">
-                      <Badge className="text-xs bg-primary/10 text-primary border border-primary/20">Interview</Badge>
-                    </SelectItem>
-                    <SelectItem value="Offer">
-                      <Badge className="text-xs bg-green-100 text-green-700 border border-green-200">Offer</Badge>
-                    </SelectItem>
-                    <SelectItem value="Rejected">
-                      <Badge className="text-xs bg-destructive/10 text-destructive border border-destructive/20">Rejected</Badge>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Badge className={`text-xs ${getStatusColor(application.status)}`}>
+                  {application.status}
+                </Badge>
               </TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
+                <div className="flex">
                   {application.jobPostingUrl && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => window.open(application.jobPostingUrl, '_blank')}
                       title="View Job Posting"
+                      className='text-primary cursor-pointer'
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -217,8 +183,9 @@ export function JobApplicationsTable({
                     size="sm"
                     onClick={() => onEdit(application)}
                     title="Edit Application"
+                    className='cursor-pointer'
                   >
-                    <Edit2 className="h-4 w-4" />
+                    <Edit2 className="h-4 w-4 text-primary" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -226,6 +193,7 @@ export function JobApplicationsTable({
                     onClick={() => handleDelete(application.id)}
                     title="Delete Application"
                     disabled={deleteMutation.isPending}
+                    className='cursor-pointer'
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>

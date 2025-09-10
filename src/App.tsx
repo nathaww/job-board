@@ -39,7 +39,8 @@ function App() {
   const totalPages = Math.ceil(filteredApplications.length / pageSize);
 
     const handleEdit = (application: JobApplication) => {
-    setEditingApplication(application);
+    // Only pass the ID for editing - the form will fetch the full data
+    setEditingApplication({ id: application.id } as JobApplication);
     setIsFormOpen(true);
   };
 

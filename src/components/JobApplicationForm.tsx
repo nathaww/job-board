@@ -1,6 +1,8 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { Loader } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -8,7 +10,7 @@ import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { jobApplicationSchema, type JobApplicationFormData } from '../lib/validations';
-import { useCreateJobApplication, useUpdateJobApplication } from '../hooks/useJobApplicationQueries';
+import { useCreateJobApplication, useUpdateJobApplication, useJobApplication } from '../hooks/useJobApplicationQueries';
 import type { JobApplication } from '../types/job';
 
 interface JobApplicationFormProps {
@@ -26,6 +28,14 @@ export function JobApplicationForm({
 }: JobApplicationFormProps) {
   const createMutation = useCreateJobApplication();
   const updateMutation = useUpdateJobApplication();
+  
+  // Fetch job application data when editing
+  const { 
+    data: jobApplicationData, 
+    isLoading: isLoadingJobData, 
+    error: jobDataError 
+  } = useJobApplication(mode === 'edit' && initialData?.id ? initialData.id : '');
+
   const {
     register,
     handleSubmit,
@@ -35,17 +45,7 @@ export function JobApplicationForm({
     reset
   } = useForm<JobApplicationFormData>({
     resolver: zodResolver(jobApplicationSchema),
-    defaultValues: initialData ? {
-      jobTitle: initialData.jobTitle,
-      jobDescription: initialData.jobDescription,
-      companyName: initialData.companyName,
-      salary: initialData.salary,
-      jobType: initialData.jobType,
-      dateApplied: initialData.dateApplied,
-      jobPostingUrl: initialData.jobPostingUrl,
-      notes: initialData.notes,
-      status: initialData.status
-    } : {
+    defaultValues: {
       jobTitle: '',
       jobDescription: '',
       companyName: '',
@@ -58,6 +58,33 @@ export function JobApplicationForm({
     }
   });
 
+  // Update form when job data is fetched
+  useEffect(() => {
+    if (mode === 'edit' && jobApplicationData) {
+      setValue('jobTitle', jobApplicationData.jobTitle);
+      setValue('jobDescription', jobApplicationData.jobDescription);
+      setValue('companyName', jobApplicationData.companyName);
+      setValue('salary', jobApplicationData.salary);
+      setValue('jobType', jobApplicationData.jobType);
+      setValue('dateApplied', jobApplicationData.dateApplied);
+      setValue('jobPostingUrl', jobApplicationData.jobPostingUrl || '');
+      setValue('notes', jobApplicationData.notes || '');
+      setValue('status', jobApplicationData.status);
+    } else if (mode === 'add') {
+      reset({
+        jobTitle: '',
+        jobDescription: '',
+        companyName: '',
+        salary: '',
+        jobType: 'Full-time',
+        dateApplied: new Date().toISOString().split('T')[0],
+        jobPostingUrl: '',
+        notes: '',
+        status: 'Applied'
+      });
+    }
+  }, [mode, jobApplicationData, setValue, reset]);
+
   const jobType = watch('jobType');
   const status = watch('status');
 
@@ -68,7 +95,7 @@ export function JobApplicationForm({
           ...data,
           notes: data.notes || ''
         });
-      } else if (initialData) {
+      } else if (mode === 'edit' && initialData?.id) {
         await updateMutation.mutateAsync({
           id: initialData.id,
           updates: {
@@ -88,6 +115,44 @@ export function JobApplicationForm({
     reset();
     onClose();
   };
+
+  // Show loading state when fetching job data for editing
+  if (mode === 'edit' && isLoadingJobData) {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
+          <DialogHeader>
+            <DialogTitle>Edit Job Application</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <Loader className="h-8 w-8 animate-spin mx-auto text-primary mb-4" />
+              <p className="text-muted-foreground">Loading job application data...</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Show error state if failed to load job data
+  if (mode === 'edit' && jobDataError) {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
+          <DialogHeader>
+            <DialogTitle>Edit Job Application</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <p className="text-destructive mb-4">Failed to load job application data</p>
+              <Button onClick={handleClose} variant="outline">Close</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -232,8 +297,17 @@ export function JobApplicationForm({
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || createMutation.isPending || updateMutation.isPending} className="bg-primary text-primary-foreground hover:bg-primary/90">
-              {(isSubmitting || createMutation.isPending || updateMutation.isPending) ? 'Saving...' : mode === 'add' ? 'Add Application' : 'Save Changes'}
+            <Button 
+              type="submit" 
+              isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {(isSubmitting || createMutation.isPending || updateMutation.isPending) 
+                ? 'Saving...' 
+                : mode === 'add' 
+                ? 'Add Application' 
+                : 'Save Changes'
+              }
             </Button>
           </div>
         </form>

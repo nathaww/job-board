@@ -6,6 +6,7 @@ import type { ApplicationStatus, JobApplication } from '../types/job';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
 interface JobApplicationsTableProps {
   applications: JobApplication[];
@@ -21,16 +22,30 @@ export function JobApplicationsTable({
 }: JobApplicationsTableProps) {
   const [sortField, setSortField] = useState<SortField>('dateApplied');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [applicationToDelete, setApplicationToDelete] = useState<JobApplication | null>(null);
   const deleteMutation = useDeleteJobApplication();
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this application?')) {
+  const handleDeleteClick = (application: JobApplication) => {
+    setApplicationToDelete(application);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (applicationToDelete) {
       try {
-        await deleteMutation.mutateAsync(id);
+        await deleteMutation.mutateAsync(applicationToDelete.id);
+        setDeleteDialogOpen(false);
+        setApplicationToDelete(null);
       } catch (error) {
         console.error('Error deleting application:', error);
       }
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setApplicationToDelete(null);
   };
 
   const handleSort = (field: SortField) => {
@@ -105,7 +120,7 @@ export function JobApplicationsTable({
         <TableHeader>
           <TableRow>
             <TableHead
-              className="cursor-pointer hover:bg-muted/50 select-none flex items-center gap-2"
+              className="cursor-pointer hover:bg-muted/50 select-none flex justify-center text-primary items-center gap-2"
               onClick={() => handleSort('jobTitle')}
             >
               Job Title
@@ -113,7 +128,7 @@ export function JobApplicationsTable({
             </TableHead>
             <TableHead className="hidden md:table-cell">Description</TableHead>
             <TableHead
-              className="cursor-pointer hover:bg-muted/50 select-none"
+              className="cursor-pointer hover:bg-muted/50 select-none text-primary"
               onClick={() => handleSort('companyName')}
             >
               <div className="flex items-center gap-2">
@@ -121,10 +136,10 @@ export function JobApplicationsTable({
                 <SortIcon field="companyName" />
               </div>
             </TableHead>
-            <TableHead className="hidden lg:table-cell">Salary</TableHead>
+            <TableHead className="hidden lg:table-cell text-center">Salary</TableHead>
             <TableHead className="hidden sm:table-cell">Type</TableHead>
             <TableHead
-              className="w-[120px] cursor-pointer hover:bg-muted/50 select-none flex gap-1 items-center"
+              className="w-[120px] cursor-pointer hover:bg-muted/50 select-none flex gap-1 text-primary items-center"
               onClick={() => handleSort('dateApplied')}
             >
               Date Applied
@@ -138,10 +153,8 @@ export function JobApplicationsTable({
           {sortedApplications.map((application) => (
             <TableRow key={application.id}>
               <TableCell className="font-medium">
-                <div>
-                  <div className="font-semibold">{application.jobTitle}</div>
-                  <div className="text-sm text-muted-foreground md:hidden">{application.companyName}</div>
-                </div>
+                <div className="font-semibold">{application.jobTitle}</div>
+                <div className="text-sm text-muted-foreground md:hidden">{application.companyName}</div>
               </TableCell>
               <TableCell className="hidden md:table-cell">
                 <div className="max-w-xs">
@@ -151,7 +164,7 @@ export function JobApplicationsTable({
               <TableCell className="hidden md:table-cell">
                 {application.companyName}
               </TableCell>
-              <TableCell className="hidden lg:table-cell">
+              <TableCell className="hidden lg:table-cell text-center">
                 {application.salary}
               </TableCell>
               <TableCell className="hidden sm:table-cell">
@@ -190,7 +203,7 @@ export function JobApplicationsTable({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(application.id)}
+                    onClick={() => handleDeleteClick(application)}
                     title="Delete Application"
                     disabled={deleteMutation.isPending}
                     className='cursor-pointer'
@@ -203,6 +216,14 @@ export function JobApplicationsTable({
           ))}
         </TableBody>
       </Table>
+
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        itemName={applicationToDelete ? `${applicationToDelete.jobTitle} at ${applicationToDelete.companyName}` : ''}
+        isDeleting={deleteMutation.isPending}
+      />
     </div>
   );
 }

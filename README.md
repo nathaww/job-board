@@ -107,15 +107,6 @@ src/
 
 ## Architecture & Data Management
 
-### React Query Integration
-The application uses **TanStack Query (React Query)** for optimal state management:
-
-- **Caching**: Automatic query caching with configurable stale times
-- **Background Updates**: Seamless data refetching and synchronization
-- **Optimistic Updates**: Instant UI feedback for user actions
-- **Error Handling**: Robust error states with retry mechanisms
-- **DevTools**: Integrated React Query DevTools for debugging
-
 ### Service Layer
 All data operations are centralized in `jobService.ts` with methods for:
 - `getAll()` - Fetch all applications

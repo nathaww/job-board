@@ -1,4 +1,3 @@
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
@@ -20,20 +19,19 @@ interface JobApplicationFormProps {
   mode: 'add' | 'edit';
 }
 
-export function JobApplicationForm({ 
-  isOpen, 
-  onClose, 
-  initialData, 
-  mode 
+export function JobApplicationForm({
+  isOpen,
+  onClose,
+  initialData,
+  mode
 }: JobApplicationFormProps) {
   const createMutation = useCreateJobApplication();
   const updateMutation = useUpdateJobApplication();
-  
-  // Fetch job application data when editing
-  const { 
-    data: jobApplicationData, 
-    isLoading: isLoadingJobData, 
-    error: jobDataError 
+
+  const {
+    data: jobApplicationData,
+    isLoading: isLoadingJobData,
+    error: jobDataError
   } = useJobApplication(mode === 'edit' && initialData?.id ? initialData.id : '');
 
   const {
@@ -120,7 +118,7 @@ export function JobApplicationForm({
   if (mode === 'edit' && isLoadingJobData) {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-secondary">
           <DialogHeader>
             <DialogTitle>Edit Job Application</DialogTitle>
           </DialogHeader>
@@ -156,18 +154,19 @@ export function JobApplicationForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className='text-2xl'>
             {mode === 'add' ? 'Add New Job Application' : 'Edit Job Application'}
           </DialogTitle>
-        </DialogHeader> 
-        
+        </DialogHeader>
+
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="jobTitle">Job Title *</Label>
               <Input
+                className='border-border'
                 id="jobTitle"
                 {...register('jobTitle')}
                 placeholder="e.g. Frontend Developer"
@@ -180,6 +179,7 @@ export function JobApplicationForm({
             <div className="space-y-2">
               <Label htmlFor="companyName">Company Name *</Label>
               <Input
+                className='border-border'
                 id="companyName"
                 {...register('companyName')}
                 placeholder="e.g. Tech Corp"
@@ -197,6 +197,7 @@ export function JobApplicationForm({
               {...register('jobDescription')}
               placeholder="Describe the job responsibilities..."
               rows={3}
+              className='border-border'
             />
             {errors.jobDescription && (
               <p className="text-sm text-red-600">{errors.jobDescription.message}</p>
@@ -207,6 +208,7 @@ export function JobApplicationForm({
             <div className="space-y-2">
               <Label htmlFor="salary">Salary *</Label>
               <Input
+                className='border-border'
                 id="salary"
                 {...register('salary')}
                 placeholder="e.g. $80,000 - $100,000"
@@ -219,6 +221,7 @@ export function JobApplicationForm({
             <div className="space-y-2">
               <Label htmlFor="dateApplied">Date Applied *</Label>
               <Input
+                className='border-border'
                 id="dateApplied"
                 type="date"
                 {...register('dateApplied')}
@@ -270,6 +273,7 @@ export function JobApplicationForm({
           <div className="space-y-2">
             <Label htmlFor="jobPostingUrl">Job Posting URL</Label>
             <Input
+              className='border-border'
               id="jobPostingUrl"
               type="url"
               {...register('jobPostingUrl')}
@@ -287,6 +291,7 @@ export function JobApplicationForm({
               {...register('notes')}
               placeholder="Any additional notes about this application..."
               rows={3}
+              className='border-border'
             />
             {errors.notes && (
               <p className="text-sm text-red-600">{errors.notes.message}</p>
@@ -297,16 +302,16 @@ export function JobApplicationForm({
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               isLoading={isSubmitting || createMutation.isPending || updateMutation.isPending}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {(isSubmitting || createMutation.isPending || updateMutation.isPending) 
-                ? 'Saving...' 
-                : mode === 'add' 
-                ? 'Add Application' 
-                : 'Save Changes'
+              {(isSubmitting || createMutation.isPending || updateMutation.isPending)
+                ? 'Saving...'
+                : mode === 'add'
+                  ? 'Add Application'
+                  : 'Save Changes'
               }
             </Button>
           </div>

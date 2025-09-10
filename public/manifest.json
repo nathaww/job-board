@@ -1,0 +1,45 @@
+{
+  "name": "Job Application Dashboard",
+  "short_name": "Job Dashboard",
+  "description": "Track and manage your job applications with ease",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "business", "utilities"],
+  "lang": "en-US",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/Image/screenshot.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Job Application Dashboard - Main Interface"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add Application",
+      "short_name": "Add Job",
+      "description": "Quickly add a new job application",
+      "url": "/?action=add",
+      "icons": [
+        {
+          "src": "/vite.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}

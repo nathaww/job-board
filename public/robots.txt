@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://job-application-dashboard.vercel.app/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1

@@ -6,6 +6,8 @@ import { JobApplicationForm } from './components/JobApplicationForm';
 import { JobApplicationsTable } from './components/JobApplicationsTable';
 import { JobApplicationFilters } from './components/JobApplicationFilters';
 import { Pagination } from './components/Pagination';
+import { StructuredData } from './components/StructuredData';
+import { ThemeToggle } from './components/ThemeToggle';
 import { useJobApplications } from './hooks/useJobApplicationQueries';
 import type { JobApplication, ApplicationStatus } from './types/job';
 
@@ -84,10 +86,18 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
+      <StructuredData />
       <div className=" mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Job Application Dashboard</h1>
-          <p className="text-muted-foreground mt-2">Track and manage your job applications</p>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Job Application Dashboard</h1>
+              <p className="text-muted-foreground mt-2">Track and manage your job applications</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+            </div>
+          </div>
         </div>
 
         <Card className="bg-card border-border shadow-sm">

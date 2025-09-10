@@ -7,7 +7,6 @@ const delay = (ms: number = 300) => new Promise(resolve => setTimeout(resolve, m
 
 const getApplicationsFromStorage = (): JobApplication[] => {
   try {
-    localStorage.removeItem(STORAGE_KEY);
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [...mockJobApplications];
   } catch (error) {

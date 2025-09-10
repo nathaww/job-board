@@ -1,15 +1,15 @@
-import { useState, useMemo } from 'react';
 import { Loader, Plus } from 'lucide-react';
-import { Button } from './components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { useMemo, useState } from 'react';
+import { JobApplicationFilters } from './components/JobApplicationFilters';
 import { JobApplicationForm } from './components/JobApplicationForm';
 import { JobApplicationsTable } from './components/JobApplicationsTable';
-import { JobApplicationFilters } from './components/JobApplicationFilters';
 import { Pagination } from './components/Pagination';
 import { StructuredData } from './components/StructuredData';
 import { ThemeToggle } from './components/ThemeToggle';
+import { Button } from './components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { useJobApplications } from './hooks/useJobApplicationQueries';
-import type { JobApplication, ApplicationStatus } from './types/job';
+import type { ApplicationStatus, JobApplication } from './types/job';
 
 function App() {
   const { data: applications = [], isLoading, error } = useJobApplications();
@@ -22,12 +22,12 @@ function App() {
 
   const filteredApplications = useMemo(() => {
     return applications.filter((app: JobApplication) => {
-      const matchesSearch = searchTerm === '' || 
+      const matchesSearch = searchTerm === '' ||
         app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
         app.companyName.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       const matchesStatus = statusFilter === 'All' || app.status === statusFilter;
-      
+
       return matchesSearch && matchesStatus;
     });
   }, [applications, searchTerm, statusFilter]);
@@ -40,8 +40,7 @@ function App() {
 
   const totalPages = Math.ceil(filteredApplications.length / pageSize);
 
-    const handleEdit = (application: JobApplication) => {
-    // Only pass the ID for editing - the form will fetch the full data
+  const handleEdit = (application: JobApplication) => {
     setEditingApplication({ id: application.id } as JobApplication);
     setIsFormOpen(true);
   };
@@ -85,24 +84,22 @@ function App() {
   }
 
   return (
+
     <div className="min-h-screen bg-background">
       <StructuredData />
-      <div className=" mx-auto px-4 py-8">
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Job Application Dashboard</h1>
-              <p className="text-muted-foreground mt-2">Track and manage your job applications</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-            </div>
+      <div className="mx-auto py-8">
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 w-full">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Job Application Dashboard</h1>
+            <p className="text-muted-foreground mt-2  text-left">Track and manage your job applications</p>
           </div>
+          <ThemeToggle />
         </div>
 
-        <Card className="bg-card border-border shadow-sm">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <Card className="bg-card border-border shadow-sm py-0">
+          <CardHeader className='px-0'>
+            <div className="flex flex-row justify-between items-center gap-4">
               <CardTitle>
                 Applications ({filteredApplications.length})
               </CardTitle>
@@ -112,7 +109,7 @@ function App() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className='px-0'>
             <JobApplicationFilters
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
@@ -120,12 +117,12 @@ function App() {
               onStatusFilterChange={setStatusFilter}
               onClearFilters={handleClearFilters}
             />
-            
+
             <JobApplicationsTable
               applications={paginatedApplications}
               onEdit={handleEdit}
             />
-            
+
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

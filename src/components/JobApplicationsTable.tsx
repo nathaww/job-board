@@ -6,6 +6,7 @@ import type { ApplicationStatus, JobApplication } from '../types/job';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
 interface JobApplicationsTableProps {
@@ -115,8 +116,9 @@ export function JobApplicationsTable({
   }
 
   return (
-    <div className="border rounded-lg">
-      <Table>
+    <TooltipProvider>
+      <div className="border rounded-lg">
+        <Table>
         <TableHeader>
           <TableRow>
             <TableHead
@@ -136,7 +138,7 @@ export function JobApplicationsTable({
                 <SortIcon field="companyName" />
               </div>
             </TableHead>
-            <TableHead className="hidden lg:table-cell text-center">Salary</TableHead>
+            <TableHead className="hidden sm:table-cell">Salary</TableHead>
             <TableHead className="hidden sm:table-cell">Type</TableHead>
             <TableHead
               className="w-[120px] cursor-pointer hover:bg-muted/50 select-none flex gap-1 text-primary items-center"
@@ -164,7 +166,7 @@ export function JobApplicationsTable({
               <TableCell className="hidden md:table-cell">
                 {application.companyName}
               </TableCell>
-              <TableCell className="hidden lg:table-cell text-center">
+              <TableCell className="text-center">
                 {application.salary}
               </TableCell>
               <TableCell className="hidden sm:table-cell">
@@ -181,35 +183,53 @@ export function JobApplicationsTable({
               <TableCell className="text-right">
                 <div className="flex">
                   {application.jobPostingUrl && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => window.open(application.jobPostingUrl, '_blank')}
-                      title="View Job Posting"
-                      className='text-primary cursor-pointer'
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => window.open(application.jobPostingUrl, '_blank')}
+                          className='text-primary cursor-pointer'
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View Job Posting</p>
+                      </TooltipContent>
+                    </Tooltip>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onEdit(application)}
-                    title="Edit Application"
-                    className='cursor-pointer'
-                  >
-                    <Edit2 className="h-4 w-4 text-primary" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteClick(application)}
-                    title="Delete Application"
-                    disabled={deleteMutation.isPending}
-                    className='cursor-pointer'
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEdit(application)}
+                        className='cursor-pointer'
+                      >
+                        <Edit2 className="h-4 w-4 text-primary" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Edit Application</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteClick(application)}
+                        disabled={deleteMutation.isPending}
+                        className='cursor-pointer'
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Delete Application</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </TableCell>
             </TableRow>
@@ -224,6 +244,7 @@ export function JobApplicationsTable({
         itemName={applicationToDelete ? `${applicationToDelete.jobTitle} at ${applicationToDelete.companyName}` : ''}
         isDeleting={deleteMutation.isPending}
       />
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }
